@@ -23,6 +23,8 @@
         <a-form-item>
           <a-button @click="handleFun('getValue', 'info')">获取当前值</a-button>
           <a-button @click="handleFun('focus')">焦点</a-button>
+          <a-button @click="handleCheck()">校验</a-button>
+          <a-button @click="handleFormat()">格式化</a-button>
         </a-form-item>
       </a-form>
     </div>
@@ -39,10 +41,10 @@ import { configParams } from './data.js'
 let monacoEditor = null
 const codeContainer = ref()
 const config = ref({
-  value: '{"name": "小明", "age": 18}',
+  value: '{\r\n    "name": "小明",\r\n    "age": 18\r\n}',
   language: 'json',
   theme: 'vs',
-  fontSize: '20',
+  fontSize: 20,
   fontWeight: 'bold',
   renderLineHighlight: 'gutter',
   folding: true,
@@ -72,11 +74,24 @@ function handleFun(str, info) {
   }
 }
 
+function handleCheck() {
+  try {
+    return JSON.parse(monacoEditor.getValue())
+  } catch (error) {
+    // 处理 JSON 格式错误
+    alert('失败: ' + error)
+  }
+}
+
+function handleFormat() {
+  monacoEditor.getAction('editor.action.formatDocument').run()
+}
+
 function monacoEditorBindEvent() {
-    // 实时获取编辑器的值
-    monacoEditor.onDidChangeModelContent(() => {
-      console.log('monacoEditor.getModel()', monacoEditor.getValue())
-    })
+  // 实时获取编辑器的值
+  monacoEditor.onDidChangeModelContent(() => {
+    console.log('monacoEditor.getModel()', JSON.stringify(monacoEditor.getValue()))
+  })
 }
 
 function setValue() {
@@ -101,6 +116,7 @@ onMounted(() => {
   }
   .right {
     padding: 20px;
+    overflow-y: auto;
   }
 }
 
@@ -109,6 +125,6 @@ onMounted(() => {
   height: 100%;
 }
 .ant-btn {
-  margin: 4px;;
+  margin: 4px;
 }
 </style>
